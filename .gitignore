@@ -1,0 +1,11 @@
+# Compiled Dynamic libraries
+*.dll
+
+# Compiled Static libraries
+*.lib
+
+# Executables
+*.exe
+
+# ignore all logs
+*.log
