@@ -1,18 +1,23 @@
 
-
-
 package main
-
 
 import (
 
-	"fmt"
-	
+
+	"fmt"	
 )
+
+func intopost(infix string)string{
+
+	postfix:=""
+
+	return postfix
+}
 
 func main() {
 
-
-	fmt.Printf("Hello")
+	//Should print: ab.c*
+	fmt.Println("Infix: ","a.b.c*")
+	fmt.Println("Postfix: ",intopost("a.b.c*"))
 
 }
