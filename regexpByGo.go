@@ -6,9 +6,86 @@ import (
 	"fmt"	
 )
 
-func intopost(infix string)string{
+type state struct{
 
-	specialschar:=map[rune]int{'*':10,'.':9,'|':8}
+	symbol rune
+	edge1 *state
+	edge2 *state
+}
+
+
+type nfa struct{
+	initial *state
+	accept *state
+}
+
+
+func poregtonfa(pofix string)*nfa{
+	
+	nfastack :=[]*nfa{}
+
+	for _,r := range pofix{
+
+		switch r{
+
+		case'.':
+
+			frag2:=nfastack[len(nfastack)-1]
+			nfastack=nfastack[:len(nfastack)-1]
+			frag1:=nfastack[len(nfastack)-1]
+			nfastack=nfastack[:len(nfastack)-1]
+
+			frag1.accept.edge1 = frag2.initial
+
+			nfastack = append(nfastack,&nfa{initial:frag1.initial,accept:frag2.accept})
+
+		case'|':
+			frag2:=nfastack[len(nfastack)-1]
+			nfastack=nfastack[:len(nfastack)-1]
+			frag1:=nfastack[len(nfastack)-1]
+			nfastack=nfastack[:len(nfastack)-1]
+
+			accept :=state{}
+			initial:=state{edge1:frag1.initial,edge2:frag2.initial}
+
+			frag1.accept.edge1 = &accept
+			frag2.accept.edge1 = &accept
+			
+			nfastack = append(nfastack,&nfa{initial:&initial,accept:&accept})
+
+	
+		case'*':
+			frag :=nfastack[len(nfastack)-1]
+			nfastack=nfastack[:len(nfastack)-1]
+
+			accept :=state{}
+			initial :=state{edge1:frag.initial,edge2:&accept}
+			frag.accept.edge1 = frag.initial
+			frag.accept.edge2 = &accept
+
+
+			nfastack = append(nfastack,&nfa{initial:&initial,accept:&accept})
+		default:
+
+			accept :=state{}
+			initial:=state{symbol:r,edge1:&accept}
+
+			nfastack=append(nfastack,&nfa{initial:&initial,accept:&accept})
+
+
+		}
+
+
+	}
+
+
+	return nfastack[0]
+
+}
+
+func in2post(infix string)string{
+
+	specialschar:=map[rune]int{'*':10,'+':10,'?':10,'.':9,'|':8}
 
 	pofix:=[]rune{}
 
@@ -16,7 +93,7 @@ func intopost(infix string)string{
 
 	for _,r :=range infix{
 
-		switch{
+		switch {
 
 			case r == '(':
 
@@ -54,22 +131,9 @@ func intopost(infix string)string{
 	return string(pofix)
 }
 
+
 func main() {
 
-	//Should print: ab.c*.
-	fmt.Println("Infix: ","a.b.c*")
-	fmt.Println("Pofix: ",intopost("a.b.c*"))
 
-	//Should print: abd|.*
-	fmt.Println("Infix: ","(a.(b|d))*")
-	fmt.Println("Pofix: ",intopost("(a.(b|d))*"))
-
-	//Should print: abd|.c*.
-	fmt.Println("Infix: ","a.(b|d).c*")
-	fmt.Println("Pofix: ",intopost("a.(b|d).c*"))
-
-	//Should print: abb.+.c.
-	fmt.Println("Infix: ","a.(b.b)+.c")
-	fmt.Println("Pofix: ",intopost("a.(b.b)+.c"))
 
 }
