@@ -29,7 +29,7 @@ func addState(list []*state, s *state, a *state)[]*state{
 			list = addState(list,s.edge2,a)
 		}
 	}
-
+ return list
 }
 
 func pomatch(po string,s string)bool{
@@ -49,7 +49,7 @@ func pomatch(po string,s string)bool{
 
 			if c.symbol == r{
 
-				next = addState(next[:],c.edge1,ponfa.accept)
+			next = addState(next[:],c.edge1,ponfa.accept)
 
 			}
 
