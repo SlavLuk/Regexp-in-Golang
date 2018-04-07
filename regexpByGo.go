@@ -19,6 +19,49 @@ type nfa struct{
 	accept *state
 }
 
+func addState(list []*state, s *state, a *state)[]*state{
+
+	list = append(list,s)
+
+	if s!=a && s.symbol == 0 {
+		list = addState(list,s.edge1,a)
+		if s.edge2 !=nil {
+			list = addState(list,s.edge2,a)
+		}
+	}
+
+}
+
+func pomatch(po string,s string)bool{
+	ismatch :=false
+
+	ponfa :=poregtonfa(po)
+
+	current := []*state{}
+	next := []*state{}
+
+	current = addState(current[:],ponfa.initial,ponfa.accept)
+
+
+	for _,r := range s{
+
+		for _,c := range current{
+
+			if c.symbol == r{
+
+				next = addState(next[:],c.edge1,ponfa.accept)
+
+			}
+
+		}
+
+		current,next = next,[]*state{}
+	}
+
+
+
+	return ismatch
+}
 
 func poregtonfa(pofix string)*nfa{
 	
