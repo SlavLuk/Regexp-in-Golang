@@ -7,7 +7,7 @@ It follows Ken Thompson's NFA algorithm invented in the mid-1960.
 https://swtch.com/~rsc/regexp/regexp1.html
 
 Shunting yard algorithm used to convert infix into postfix notation
-The metacharacters *, +, and ? are repetition operators: e1* matches a sequence of zero or more (possibly different) strings, each of which match e1; e1+ matches one or more; e1? matches zero or one.
+The metacharacters \\*, \\+, and \\? are repetition operators: e1* matches a sequence of zero or more (possibly different) strings, each of which match e1; e1+ matches one or more; e1? matches zero or one.
 
 
 
