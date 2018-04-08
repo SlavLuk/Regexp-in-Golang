@@ -11,6 +11,7 @@ type state struct{
 	symbol rune
 	edge1 *state
 	edge2 *state
+
 }
 
 
@@ -32,7 +33,10 @@ func addState(list []*state, s *state, a *state)[]*state{
  return list
 }
 
-func pomatch(po string,s string)bool{
+func pomatch(p string,s string)bool{
+
+	po :=in2post(p)
+
 	ismatch :=false
 
 	ponfa :=poregtonfa(po)
@@ -58,7 +62,13 @@ func pomatch(po string,s string)bool{
 		current,next = next,[]*state{}
 	}
 
+	for _,c := range current {
 
+		if c == ponfa.accept{
+			ismatch = true
+			break
+		}
+	}
 
 	return ismatch
 }
@@ -80,23 +90,51 @@ func poregtonfa(pofix string)*nfa{
 
 			frag1.accept.edge1 = frag2.initial
 
-			nfastack = append(nfastack,&nfa{initial:frag1.initial,accept:frag2.accept})
+			nfastack = append(nfastack,&nfa{initial:frag1.initial,accept:frag2.accept})	
+
+		case '+':
+			//popping one fragment off nfastack
+			frag := nfastack[len(nfastack)-1]
+			nfastack := nfastack[:len(nfastack)-1]
+			//creating new accept state
+			accept := state{}
+			//create new initial state with edge to fragment
+			initial := state{edge1: frag.initial}
+			//setting fragment accept state arrows back to start of fragment and to the new accept state
+			frag.accept.edge1 = frag.initial
+			frag.accept.edge2 = &accept
+
+			//appending new concatenated fragment to stack
+			nfastack = append(nfastack, &nfa{initial: &initial, accept: &accept})
 
 		case'|':
+			//popping one fragment off nfastack
 			frag2:=nfastack[len(nfastack)-1]
 			nfastack=nfastack[:len(nfastack)-1]
 			frag1:=nfastack[len(nfastack)-1]
 			nfastack=nfastack[:len(nfastack)-1]
-
+			//creating new accept state
 			accept :=state{}
+			//create new initial state with edge to fragment
 			initial:=state{edge1:frag1.initial,edge2:frag2.initial}
-
+			//setting fragment accept state arrows back to start of fragment and to the new accept state
 			frag1.accept.edge1 = &accept
 			frag2.accept.edge1 = &accept
-			
+			//appending new concatenated fragment to stack
 			nfastack = append(nfastack,&nfa{initial:&initial,accept:&accept})
 
-	
+		case '?':
+			//popping one fragment off nfastack
+			frag:=nfastack[len(nfastack)-1]
+			nfastack=nfastack[:len(nfastack)-1]
+
+			accept :=state{}
+			initial :=state{edge1:frag.initial,edge2:&accept}
+			frag.accept.edge1 = &accept
+			frag.accept.edge2 = &accept
+
+			nfastack = append(nfastack,&nfa{initial:&initial,accept:&accept})
+		
 		case'*':
 			frag :=nfastack[len(nfastack)-1]
 			nfastack=nfastack[:len(nfastack)-1]
@@ -108,6 +146,8 @@ func poregtonfa(pofix string)*nfa{
 
 
 			nfastack = append(nfastack,&nfa{initial:&initial,accept:&accept})
+
+			
 		default:
 
 			accept :=state{}
@@ -177,6 +217,6 @@ func in2post(infix string)string{
 
 func main() {
 
-
+fmt.Println(pomatch("a.b?","a"))
 
 }
