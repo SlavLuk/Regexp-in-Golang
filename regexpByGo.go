@@ -49,9 +49,11 @@ func match(infix string,str string)bool{
 	//construct non-deterministic finite automata
 	postnfa :=postregtonfa(postfix)
 
+	//arrays of empty struct states
 	current := []*state{}
 	next := []*state{}
 
+	//init current state
 	current = addState(current[:],postnfa.initial,postnfa.accept)
 
 	for _,r := range str{
@@ -64,13 +66,15 @@ func match(infix string,str string)bool{
 
 			}
 		}
-
+		//assign current to next ,next to empty array 
 		current,next = next,[]*state{}
 	}
 
 	for _,c := range current {
 
+		//if state is accept state
 		if c == postnfa.accept{
+
 			ismatch = true
 			break
 		}
@@ -78,7 +82,7 @@ func match(infix string,str string)bool{
 
 	return ismatch
 }
-
+//create stack and fragments of postfix 
 func postregtonfa(postfix string)*nfa{
 	
 	nfastack :=[]*nfa{}
@@ -88,14 +92,15 @@ func postregtonfa(postfix string)*nfa{
 		switch r{
 
 		case'.':
-
+			//popping one fragment off nfastack
 			frag2:=nfastack[len(nfastack)-1]
 			nfastack=nfastack[:len(nfastack)-1]
 			frag1:=nfastack[len(nfastack)-1]
 			nfastack=nfastack[:len(nfastack)-1]
 
+			//join fragments
 			frag1.accept.edge1 = frag2.initial
-
+			//appending new concatenated fragment to stack
 			nfastack = append(nfastack,&nfa{initial:frag1.initial,accept:frag2.accept})	
 
 		case '+':
@@ -236,7 +241,7 @@ func validateChar(input string)bool{
 
 func main() {
 
-	//
+	//ask user for input
 	fmt.Println("Please enter  a reg expression (a.b.c|d+.e):")	
 
 	var regexp string
