@@ -184,6 +184,7 @@ func in2post(infix string)string{
 
 	s:=[]rune{}
 
+	//loop thru infix string
 	for _,r :=range infix{
 
 		switch {
@@ -254,7 +255,7 @@ func main() {
 			fmt.Scan(&regexp)
 	}
 
-
+	//ask user for input
 	fmt.Println("Please enter a string to check against (abc):")
 
 		var str string
