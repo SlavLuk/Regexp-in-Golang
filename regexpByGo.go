@@ -4,8 +4,10 @@ package main
 import (
 
 	"fmt"	
+	"strings"
 )
 
+//create struct for each state
 type state struct{
 
 	symbol rune
@@ -14,49 +16,53 @@ type state struct{
 
 }
 
-
+//create struct nfa containing all states
 type nfa struct{
 	initial *state
 	accept *state
 }
-
+//helper recursive function to add states to list
 func addState(list []*state, s *state, a *state)[]*state{
 
 	list = append(list,s)
 
 	if s!=a && s.symbol == 0 {
+		//recursive call
 		list = addState(list,s.edge1,a)
-		if s.edge2 !=nil {
-			list = addState(list,s.edge2,a)
+
+	if s.edge2 !=nil {
+		//recursive call
+		list = addState(list,s.edge2,a)
+
 		}
 	}
  return list
 }
 
-func pomatch(p string,s string)bool{
+func match(infix string,str string)bool{
 
-	po :=in2post(p)
+	//convert infix into postfix notation
+	postfix :=in2post(infix)
 
 	ismatch :=false
 
-	ponfa :=poregtonfa(po)
+	//construct non-deterministic finite automata
+	postnfa :=postregtonfa(postfix)
 
 	current := []*state{}
 	next := []*state{}
 
-	current = addState(current[:],ponfa.initial,ponfa.accept)
+	current = addState(current[:],postnfa.initial,postnfa.accept)
 
-
-	for _,r := range s{
+	for _,r := range str{
 
 		for _,c := range current{
 
 			if c.symbol == r{
 
-			next = addState(next[:],c.edge1,ponfa.accept)
+			next = addState(next[:],c.edge1,postnfa.accept)
 
 			}
-
 		}
 
 		current,next = next,[]*state{}
@@ -64,7 +70,7 @@ func pomatch(p string,s string)bool{
 
 	for _,c := range current {
 
-		if c == ponfa.accept{
+		if c == postnfa.accept{
 			ismatch = true
 			break
 		}
@@ -73,11 +79,11 @@ func pomatch(p string,s string)bool{
 	return ismatch
 }
 
-func poregtonfa(pofix string)*nfa{
+func postregtonfa(postfix string)*nfa{
 	
 	nfastack :=[]*nfa{}
 
-	for _,r := range pofix{
+	for _,r := range postfix{
 
 		switch r{
 
@@ -109,10 +115,12 @@ func poregtonfa(pofix string)*nfa{
 
 		case'|':
 			//popping one fragment off nfastack
-			frag2:=nfastack[len(nfastack)-1]
-			nfastack=nfastack[:len(nfastack)-1]
 			frag1:=nfastack[len(nfastack)-1]
 			nfastack=nfastack[:len(nfastack)-1]
+
+			frag2:=nfastack[len(nfastack)-1]
+			nfastack=nfastack[:len(nfastack)-1]
+			
 			//creating new accept state
 			accept :=state{}
 			//create new initial state with edge to fragment
@@ -154,23 +162,20 @@ func poregtonfa(pofix string)*nfa{
 			initial:=state{symbol:r,edge1:&accept}
 
 			nfastack=append(nfastack,&nfa{initial:&initial,accept:&accept})
-
-
 		}
-
-
 	}
-
 
 	return nfastack[0]
 
 }
 
+//shunting yard algorithm used to convert infix into postfix notation
 func in2post(infix string)string{
 
+	//precedence of special chars
 	specialschar:=map[rune]int{'*':10,'+':10,'?':10,'.':9,'|':8}
 
-	pofix:=[]rune{}
+	postfix:=[]rune{}
 
 	s:=[]rune{}
 
@@ -185,7 +190,8 @@ func in2post(infix string)string{
 			case r==')':
 
 				for s[len(s)-1]!='(' {
-					pofix = append(pofix,s[len(s)-1])
+
+					postfix = append(postfix,s[len(s)-1])
 					s = s[:len(s)-1]
 
 				}
@@ -195,28 +201,110 @@ func in2post(infix string)string{
 			case specialschar[r]>0:
 
 				for len(s)>0 && specialschar[r]<=specialschar[s[len(s)-1]]{
-					pofix,s = append(pofix,s[len(s)-1]),s[:len(s)-1]
+					postfix,s = append(postfix,s[len(s)-1]),s[:len(s)-1]
 				}
 				s=append(s,r)
 
-		default:
-			pofix=append(pofix,r)
+			default:
 
-
+				postfix=append(postfix,r)
 		}
 	}
+ 			for len(s)>0{
 
-  for len(s)>0{
+				postfix,s = append(postfix,s[len(s)-1]),s[:len(s)-1]
+ 		 }
 
-	pofix,s = append(pofix,s[len(s)-1]),s[:len(s)-1]
-  }
-
-	return string(pofix)
+	return string(postfix)
 }
 
+
+
+//validate first input char
+func validateChar(input string)bool{
+
+	input = strings.ToLower(input)
+
+	if input[0] >=97 && input[0] <= 122{
+
+
+		return true
+	}
+
+	return false
+}
 
 func main() {
 
-fmt.Println(pomatch("a.b?","a"))
+	//
+	fmt.Println("Please enter  a reg expression (a.b.c|d+.e):")	
+
+	var regexp string
+	//read user input
+	fmt.Scan(&regexp)
+
+	for !validateChar(regexp){
+
+			fmt.Println("Please enter valid reg exp...")
+			fmt.Scan(&regexp)
+	}
+
+
+	fmt.Println("Please enter a string to check against (abc):")
+
+		var str string
+		fmt.Scan(&str)
+
+	matched :=match(regexp,str)
+
+	//output result to user
+	if matched {
+	fmt.Println("Full match")
+	} else {
+	fmt.Println("No match")
+	}
+
+	fmt.Println("Please enter  1 to continue or -1 to exit:")	
+	var exit int
+	fmt.Scan(&exit)
+
+
+for exit !=-1 {
+
+	fmt.Println("Please enter  a reg expression (a.b.c|d+.e):")	
+
+	var regexp string
+	fmt.Scan(&regexp)
+
+	for !validateChar(regexp){
+
+			fmt.Println("Please enter valid reg exp...")
+			fmt.Scan(&regexp)
+	}
+
+
+fmt.Println("Please enter a string to check against (abc):")
+
+	var str string
+	fmt.Scan(&str)
+
+matched :=match(regexp,str)
+
+	//output result to user
+		if matched {
+
+			fmt.Println("Full match")
+
+		} else {
+			fmt.Println("No match")
+		}
+
+fmt.Println("Please enter  1 to continue or -1 to exit:")	
+	
+	fmt.Scan(&exit)
 
 }
+
+
+}
+ 
