@@ -1,6 +1,7 @@
 # Regexp-in-Golang
 
-##Description
+## Description
+
 This is a regular expression engine implemented in Golang.
 It follows Ken Thompson's NFA algorithm invented in the mid-1960.
 https://swtch.com/~rsc/regexp/regexp1.html
