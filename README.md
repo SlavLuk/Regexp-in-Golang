@@ -1,5 +1,13 @@
 # Regexp-in-Golang
 
+##Description
+This is a regular expression engine implemented in Golang.
+It follows Ken Thompson's NFA algorithm invented in the mid-1960.
+https://swtch.com/~rsc/regexp/regexp1.html
+
+Shunting yard algorithm used to convert infix into postfix notation
+The metacharacters *, +, and ? are repetition operators: e1* matches a sequence of zero or more (possibly different) strings, each of which match e1; e1+ matches one or more; e1? matches zero or one.
+
 
 
 ## Installation
@@ -18,6 +26,13 @@ git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY
 
 9. Press Enter. Your local clone will be created.
 
+## Run and Test
+1.Go to the location you cloned and press regexpByGo file to open Visual Studio code 
+2.Open terminal cd location you cloned  
+3.First you will be asked to enter regular expression e.g, a.b.c ,every letter must be followed by .(dot) except the last one if quantifier follows a letter .(dot) must follow quantifier 
+4.Second prompt will be asked to enter a string to check against the reg exp 
+5.Next you can press 1 to continue or -1 to exit programm
+after a letter follows 
 
 ## License
 
